@@ -1,5 +1,5 @@
 # The URL the site will be built for
-base_url = "https://alussier.github.io/blog"
+base_url = "https://lussier.xyz"
 
 theme = "terminimal"
 
