@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title></title>
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="robots" content="noodp"/>
+
+    <link rel="stylesheet" href="https://blog.lussier.xyz/style.css">
+    <link rel="stylesheet" href="https://blog.lussier.xyz/color/green.css">
+
+        <link rel="stylesheet" href="https://blog.lussier.xyz/color/background_dark.css">
+    
+    <link rel="stylesheet" href="https://blog.lussier.xyz/font-hack-subset.css">
+
+    </head>
+
+<body class="">
+<div class="container">
+    
+    <header class="header">
+        <div class="header__inner">
+            <div class="header__logo">
+                    
+                <a href="https://blog.lussier.xyz" style="text-decoration: none;">
+                    <div class="logo">
+                      
+                            Adam&#x27;s blog
+                        
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        
+        
+        
+    </header>
+    
+
+    <div class="content">
+        
+        <div class="posts">
+                <div class="post on-list">
+                    
+    <h1 class="post-title"><a href="https://blog.lussier.xyz/2022-11-17/">2022-11-17 - New blog, badblocks, smartctl, apcupsd</a></h1>
+    <div class="post-meta-inline">
+        
+    <span class="post-date"></span>
+
+    </div>
+
+    
+
+                    
+        <div class="post-content">
+            <p>Today, I read this: <a href="https://gekk.info/articles/adhd.html">https://gekk.info/articles/adhd.html</a> <a href="https://archive.ph/im7g5">[archive.ph]</a></p>
+<p>The author suggests that focusing on other people's reaction to one's work can help with motivation.  Maybe bragging on this blog will be a nice motivator for me to finish more projects ;)</p>
+<p>Today, I've been testing my new array of 4x18TB HDDs (WD easystore WDBAMA0180HBK-NESN):</p>
+<pre><code>$ sudo badblocks -sw -t random -b 8192 &#x2F;dev&#x2F;sdh
+</code></pre>
+<p>It's been running for ~12h and is ~50% done.  I figure this is a good test because it is both checking the integrity of the entire drive, as well as ensuring it can run for 24h without issue (before I shuck them from their USB enclosures and potentially void the warranty).</p>
+<p>I'm also watching the temperature of the drives (<code>hddtemp</code> couldn't read them):</p>
+<pre><code>$ watch -n60 &quot;sudo smartctl -A &#x2F;dev&#x2F;sdh | grep Temp; \
+    sudo smartctl -A &#x2F;dev&#x2F;sdi | grep Temp; \
+    sudo smartctl -A &#x2F;dev&#x2F;sdj | grep Temp; \
+    sudo smartctl -A &#x2F;dev&#x2F;sdk | grep Temp&quot;
+</code></pre>
+<p>They are currently between 55 and 60°C.</p>
+<p>Today I also checked how much power my server and HDDs are using according to the UPS.  I believe I can multiply <code>LOADPCT</code> by <code>NOMPOWER</code> to get the usage:</p>
+<pre><code>$ sudo apcaccess status
+APC      : 001,036,0874
+DATE     : 2022-11-17 03:52:08 -0500
+HOSTNAME : delevan
+VERSION  : 3.14.14 (31 May 2016) debian
+UPSNAME  : delevan
+CABLE    : USB Cable
+DRIVER   : USB UPS Driver
+UPSMODE  : Stand Alone
+STARTTIME: 2022-11-15 22:35:36 -0500
+MODEL    : Back-UPS RS 1000MS
+STATUS   : ONLINE
+LINEV    : 121.0 Volts
+LOADPCT  : 19.0 Percent
+BCHARGE  : 100.0 Percent
+TIMELEFT : 28.4 Minutes
+MBATTCHG : 5 Percent
+MINTIMEL : 3 Minutes
+MAXTIME  : 60 Seconds
+SENSE    : Medium
+LOTRANS  : 88.0 Volts
+HITRANS  : 144.0 Volts
+ALARMDEL : 30 Seconds
+BATTV    : 27.3 Volts
+LASTXFER : Automatic or explicit self test
+NUMXFERS : 0
+TONBATT  : 0 Seconds
+CUMONBATT: 0 Seconds
+XOFFBATT : N&#x2F;A
+SELFTEST : NO
+STATFLAG : 0x05000008
+SERIALNO : 4B2104P42050
+BATTDATE : 2021-02-01
+NOMINV   : 120 Volts
+NOMBATTV : 24.0 Volts
+NOMPOWER : 600 Watts
+FIRMWARE : 950.e4 .D USB FW:e4
+END APC  : 2022-11-17 03:52:45 -0500
+</code></pre>
+
+        </div>
+
+                </div>
+            
+                <div class="post on-list">
+                    
+    <h1 class="post-title"><a href="https://blog.lussier.xyz/2022-12-08/">2022-12-08 - Flashing Dell PowerEdge T30 to Precision T3620</a></h1>
+    <div class="post-meta-inline">
+        
+    <span class="post-date"></span>
+
+    </div>
+
+    
+
+                    
+        <div class="post-content">
+            <p>I have a Dell PowerEdge T30 that has always been very picky about booting from USB.</p>
+<p>I have been booting off a USB flash drive and loading kernel+initramfs off the ZFS pool (probably not the best idea...).</p>
+<p>I thought I rememebered getting it working like this before, but no luck:
+https://www.rodsbooks.com/efi-bootloaders/fallback.html
+https://archive.ph/odkx7</p>
+<p>I tried burning Debian to a DVD, using a USB-SATA adapter to connect the drive.  Not good enough.</p>
+<p>When I finally removed my internal HDDs from the SATA bus and connected the DVD drive directly, it will boot just fine.</p>
+<p>I ended up finding this page detailing how to flash a Precision T3620 firmware instead:
+https://networkcookbook.com/2021/05/flashing-dell-poweredge-t30-to-precision-t3620/
+https://archive.ph/PoluE</p>
+<p>This mod also will enable the M.2 slot on the motherboard, which Dell disabled with a firmware update (?!?!?).  They were kind enough to leave mine unpopulated on the board, so this was less useful.  However, after finishing, I am able to boot off any USB flash drive as I would expect.</p>
+<p>One note: the directions say to jump CMCLR and then put the jumper back on PSWD before re-initializing the ME.  However, I saw an error that the ME could not be cleared.  I needed to have the jumper on SERVICE_MODE, then I was successful.</p>
+<p>I was ~1% worried that revealing my service tag to the firmware could be problematic, but I set it based on the sticker on the chassis, and saw no issues.</p>
+
+        </div>
+
+                </div>
+            <div class="pagination">
+                <div class="pagination__buttons"></div>
+            </div>
+        </div>
+        
+    </div>
+
+    
+    <footer class="footer">
+        <div class="footer__inner">
+                <div class="copyright">
+                        <span>© 
+    2022
+ Adam Lussier</span>
+                    <span class="copyright-theme">
+                        <span class="copyright-theme-sep">:: </span>
+                        Theme: <a href="https://github.com/pawroman/zola-theme-terminimal/">Terminimal</a> by pawroman
+                    </span>
+                </div>
+            </div>
+    </footer>
+    
+
+</div>
+</body>
+
+</html>
